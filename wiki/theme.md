@@ -30,7 +30,7 @@ All variables used in the template file from theme :
 * `<?= \Theme::instance()->asset->render('js_plugin'); ?>` in the footer
 * Your need to load jQuery, jQuery UI, and optionnaly Twitter Bootstrap v3 + Font Awesome
 
-You can see an example of template here : [`url/example/template.php`](https://github.com/jhuriez/fuel-module-url/blob/master/example/template.php)
+You can see an example of template here : [`url/example/template.php`](http://github.com/jhuriez/fuel-lb-package/blob/master/example/template.php)
 
 ### Change assets groups name
 

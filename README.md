@@ -10,4 +10,4 @@ You need to load this package for all Lb's module
 
 ## Module and Theme Library
 
-If you want to use lb module : [See Here]()
+If you want to use lb module : [See Here](http://github.com/jhuriez/fuel-lb-package/blob/master/wiki/theme.md)
