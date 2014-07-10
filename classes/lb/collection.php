@@ -23,18 +23,29 @@ class Collection
      * @param bool $isUpdate It's an update or create ? (Form)
      * @param bool $deleteObject If we delete the object or just remove the relationship if he's not in the collection
      * @param array $attributes Attributes of object in collection
+     *              array('libelle', 'price');
+     *              array('libelle', 'price' => array('float')) // Do the function 'float' on the attribute price
+     *              array('libelle', 'price' => array('changeName' => 'new_price_name')) // Do the function 'changeName' with argument 'new_price_name'
+     *              array('libelle', 'price' => array('float', 'changeName' => 'new_price_name')) // Do both function
+     * @param mixed $container the container ($_POST) by default
+     * @param string $isNewElement The new element identifier
      * @return array
      */
-    public static function manage($parentObject, $collectionClassName, $collectionName, $updateCollection = false, $isUpdate = false, $deleteObject = false, $attributes = array())
+    public static function manage($parentObject, $collectionClassName, $collectionName, $updateCollection = false, $isUpdate = false, $deleteObject = false, $attributes = array(), $container = null, $isNewElement = 'is_new_element')
     {
+        $container = (is_array($container)) ? $container : \Input::post();
+
         $objectsToDelete = array();
         $objectsKey = array_keys($parentObject->{$collectionName});
 
+        ////////////
+        // UPDATE //
+        ////////////
         if ($isUpdate)
         {
             foreach ($objectsKey as $objectId)
             {
-                if (\Input::post($collectionName.'.'.$objectId) === null)
+                if (\Arr::get($container, $collectionName.'.'.$objectId) === null)
                 {
                     // Delete the object
                     $deleteObject and $objectsToDelete[] = $parentObject->{$collectionName}[$objectId];
@@ -48,11 +59,20 @@ class Collection
                     {
                         if (!is_array($attribute))
                         {
-                            $fromArray[$attribute] = \Input::post($collectionName.'.'.$objectId.'.'.$attribute);
+                            $attributeValue = \Arr::get($container, $collectionName.'.'.$objectId.'.'.$attribute);
+                            $fromArray[$attribute] = $attributeValue;
                         }
+                        // Do Function
                         else
                         {
-                            $fromArray[$attributeKey] = static::doFunction(\Input::post($collectionName.'.'.$objectId.'.'.$attributeKey), $attribute);
+                            $attributeValue = \Arr::get($container, $collectionName.'.'.$objectId.'.'.$attributeKey);
+
+                            // Use attribute key as attribute
+                            if (array_key_exists('newName', $attribute))
+                            {
+                                $attributeKey = $attribute['newName'];
+                            }
+                            $fromArray[$attributeKey] = static::doFunction($attributeValue, $attribute);
                         }
                     }
                     $parentObject->{$collectionName}[$objectId]->from_array($fromArray);
@@ -60,8 +80,23 @@ class Collection
             }
         }
 
+        /////////////////
+        // NEW ELEMENT //
+        /////////////////
+
         // Fetch the POST
-        $collectionPost = (\Input::post($collectionName)) ? : array();
+        $collectionPost = (\Arr::get($container, $collectionName)) ? : array();
+
+        // Fetch all new element
+        foreach ($collectionPost as $k => $v)
+        {
+            if ($k != 'new' && isset($v[$isNewElement]) && $v[$isNewElement] == '1')
+            {
+                $collectionPost['new'][$k] = $v;
+                unset($collectionPost[$k]);
+            }
+        }
+        
         foreach ($collectionPost as $k => $v)
         {
             // If create the collection object
@@ -73,11 +108,20 @@ class Collection
                     {
                         if (!is_array($attribute)) 
                         {
-                            $fromArray[$attribute] = $objectPost[$attribute];
+                            $attributeValue = isset($objectPost[$attribute]) ? $objectPost[$attribute] : null;
+                            $fromArray[$attribute] = $attributeValue;
                         }
+                        // Do Function
                         else
                         {
-                            $fromArray[$attributeKey] = static::doFunction($objectPost[$attributeKey], $attribute);
+                            $attributeValue = isset($objectPost[$attributeKey]) ? $objectPost[$attributeKey] : null;
+
+                            // Use attribute key as attribute
+                            if (array_key_exists('newName', $attribute))
+                            {
+                                $attributeKey = $attribute['newName'];
+                            }
+                            $fromArray[$attributeKey] = static::doFunction($attributeValue, $attribute);
                         }
                     }
                     $object = call_user_func(array($collectionClassName, 'forge'), $fromArray);
@@ -111,11 +155,47 @@ class Collection
     
     public static function doFunction($value, $function)
     {
-        switch($function[0])
+        foreach($function as $nameFunction => $arg)
         {
-            case 'explode':
-                return explode($function[1], $value);
-            break;
+            is_numeric($nameFunction) and $nameFunction = $arg;
+
+            switch($nameFunction)
+            {
+                case 'explode':
+                    $value = explode($arg, $value);
+                break;
+
+                case 'int':
+                    $value = (int)$value;
+                break;
+
+                case 'float':
+                    $dotPos = strrpos($value, '.');
+                    $commaPos = strrpos($value, ',');
+                    $sep = (($dotPos > $commaPos) && $dotPos) ? $dotPos : 
+                        ((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
+                   
+                    if (!$sep) {
+                        return floatval(preg_replace("/[^0-9]/", "", $value));
+                    } 
+
+                    $value = floatval(
+                        preg_replace("/[^0-9]/", "", substr($value, 0, $sep)) . '.' .
+                        preg_replace("/[^0-9]/", "", substr($value, $sep+1, strlen($value)))
+                    );
+                break;
+
+                case 'bool':
+                case 'boolean':
+                    if ($value == 'true') $value = true;
+                    else if ($value == '1') $value = true;
+                    else if ($value == 'false') $value = false;
+                    else if ($value == '0') $value = false;
+                    else $value = (boolean)$value;
+                break;
+            }
         }
+
+        return $value;
     }
 }

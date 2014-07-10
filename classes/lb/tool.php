@@ -48,6 +48,24 @@ Class Tool
 		return date($format, $timestamp);
 	}
 
+	/**
+	 * Get array for SELECT Input from a model
+	 * @param  string $modelClassName
+	 * @param  string $keyAttribute  
+	 * @param  srting $valueAttribute
+	 * @return array                
+	 */
+	public static function getArraySelectInput($modelClassName, $keyAttribute, $valueAttribute)
+	{
+		$query = call_user_func(array($modelClassName, 'query'));
+        $objects = $query->select($keyAttribute, $valueAttribute)->get();
+        $res = array();
+
+        foreach($objects as $object)
+            $res[$object->{$keyAttribute}] = $object->{$valueAttribute};
+        
+        return $res;
+	}
 
 	/**
 	 * Helper for image upload process
@@ -59,8 +77,8 @@ Class Tool
 		$fieldsName[] = 'Filedata'; // If Uploadify
 
 		// Config miniature
-		(!isset($miniatureConfig['quality'])) and $miniatureConfig['quality'] = 70;
-		(!isset($miniatureConfig['folder'])) and $miniatureConfig['folder'] = 'optimize';
+		(!isset($miniatureConfig['quality']) || !$miniatureConfig['quality']) and $miniatureConfig['quality'] = 70;
+		(!isset($miniatureConfig['folder']) || !$miniatureConfig['folder']) and $miniatureConfig['folder'] = 'optimize';
 		$miniatureConfig['resize'] = isset($miniatureConfig['resize']) && $miniatureConfig['resize'] !== null ? 
 									$miniatureConfig['resize'] : (isset($miniatureConfig['height']) && $miniatureConfig['height'] !== null &&
 																  isset($miniatureConfig['width']) && $miniatureConfig['width'] !== null);
@@ -77,7 +95,7 @@ Class Tool
 					$path = $uploadConfig['path'];
 
 					// Get extension
-					(!isset($miniatureConfig['ext'])) and $miniatureConfig['ext'] = $file['extension'];
+					(!isset($miniatureConfig['ext']) || !$miniatureConfig) and $miniatureConfig['ext'] = $file['extension'];
 
 					///////////////////////////////////////////
 					// Original convert (for extension) 	 //
@@ -143,6 +161,11 @@ Class Tool
 				}
 			}
 		}
+
+		// Replace "\" by "/" standard URI
+		$imageName = str_replace(DS.DS, '/', $imageName);
+		$imageName = str_replace(DS, '/', $imageName);
+
         if ($returnArray)
         {
         	return array(

@@ -9,6 +9,8 @@ Autoloader::add_classes(array(
         'Lb\\Security' => __DIR__.'/classes/lb/security.php',
         'Lb\\Collection' => __DIR__.'/classes/lb/collection.php',
 		'Lb\\Lb_Addons_Twig'    => __DIR__.'/classes/lb/addons/twig.php',
+		'Lb\\DepartementHelper' => __DIR__.'/classes/lb/departementHelper.php',
+		'Lb\\ImageHelper' => __DIR__.'/classes/lb/imageHelper.php',
 ));
 
 \Config::load('lb', true);
