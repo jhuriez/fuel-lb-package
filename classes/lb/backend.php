@@ -13,16 +13,18 @@ Class Backend
      * @param string $theme  
      * @param boolean $casset
      * @param array   $attr  
-     * @param boolean $raw   
+     * @param boolean $raw  
+     * @param string $pathName 
      */
-    public static function addAsset($files, $type, $group, $theme = null, $casset = false, $attr = array(), $raw = false)
+    public static function addAsset($files, $type, $group, $theme = null, $casset = false, $attr = array(), $raw = false, $pathName = 'theme')
     {
         $group = (\Config::get('lb.theme.assets.'.$group) ? : $group);
 
         if ($casset)
         {
+            $pathName = ($pathName == false) ? '' : $pathName . '::';
             foreach((array)$files as $file)
-                \Casset::{$type}('theme::'.$file, false, $group);
+                \Casset::{$type}($pathName.$file, false, $group);
         }
         else
         {
