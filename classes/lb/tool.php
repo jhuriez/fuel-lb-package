@@ -75,6 +75,7 @@ Class Tool
 	{
 		$imageName = '';
 		$fieldsName[] = 'Filedata'; // If Uploadify
+		$fieldsName[] = 'files:0'; // If File Upload Bootstrap
 
 		// Config miniature
 		(!isset($miniatureConfig['quality']) || !$miniatureConfig['quality']) and $miniatureConfig['quality'] = 70;
@@ -82,9 +83,12 @@ Class Tool
 		$miniatureConfig['resize'] = isset($miniatureConfig['resize']) && $miniatureConfig['resize'] !== null ? 
 									$miniatureConfig['resize'] : (isset($miniatureConfig['height']) && $miniatureConfig['height'] !== null &&
 																  isset($miniatureConfig['width']) && $miniatureConfig['width'] !== null);
+		(!isset($miniatureConfig['ext']) || empty($miniatureConfig['ext'])) and $miniatureConfig['ext'] = array();
+		(!is_array($miniatureConfig['ext'])) and $miniatureConfig['ext'] = array($miniatureConfig['ext']);
 
 		// Upload
 		\Upload::process($uploadConfig);
+
 		
 		if (\Upload::is_valid()){
 			\Upload::save();
@@ -95,16 +99,17 @@ Class Tool
 					$path = $uploadConfig['path'];
 
 					// Get extension
-					(!isset($miniatureConfig['ext']) || !$miniatureConfig) and $miniatureConfig['ext'] = $file['extension'];
+					(empty($miniatureConfig['ext']) || !$miniatureConfig) and $miniatureConfig['ext'][] = $file['extension'];
+					$extCast = reset($miniatureConfig['ext']);
 
 					///////////////////////////////////////////
 					// Original convert (for extension) 	 //
 					///////////////////////////////////////////
-					if ($miniatureConfig['ext'] != $file['extension'])
+					if ( ! in_array($file['extension'], $miniatureConfig['ext']))
 					{
 						$image = \Image::forge()->load($path . DS . $savedAs);
-						$originalImageNameNoExtension = \Str::sub($savedAs, 0, strlen($miniatureConfig['ext'])*-1-1);
-						$originalImageName = $originalImageNameNoExtension . '.' . $miniatureConfig['ext'];
+						$originalImageNameNoExtension = \Str::sub($savedAs, 0, strlen($extCast)*-1-1);
+						$originalImageName = $originalImageNameNoExtension . '.' . $extCast;
 						// check if the file already exists
 						if (file_exists($path . DS . $originalImageName))
 						{
@@ -114,7 +119,7 @@ Class Tool
 							do
 							{
 								$suffix = '_'.++$counter;
-								$originalImageName = $originalImageNameNoExtension . $suffix . '.' . $miniatureConfig['ext'];
+								$originalImageName = $originalImageNameNoExtension . $suffix . '.' . $extCast;
 							}
 							while (file_exists($path . DS . $originalImageName));
 						}
@@ -124,6 +129,10 @@ Class Tool
 						
 						$savedAs = $originalImageName;
 					}
+					else
+					{
+						$extCast = $file['extension'];
+					}
 
 
 					/////////////////////////
@@ -131,7 +140,7 @@ Class Tool
 					/////////////////////////
 					$optimizedImage = \Image::forge(array('quality' => $miniatureConfig['quality']));
 					$optimizedImage->load($path . DS . $savedAs);
-					$optimizedImageName = \Str::sub($savedAs, 0, strlen($miniatureConfig['ext'])*-1-1) . '.' . $miniatureConfig['ext'];
+					$optimizedImageName = \Str::sub($savedAs, 0, strlen($extCast)*-1-1) . '.' . $extCast;
 
 	                // Check if folder exist
 	                if (!file_exists($uploadConfig['path'] . DS . $miniatureConfig['folder']))
