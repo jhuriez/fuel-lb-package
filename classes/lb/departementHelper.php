@@ -7,31 +7,82 @@ class DepartementHelper
 
     // All region FR
     public static $regionName = array(
-        'Alsace' => '67,68',
-        'Aquitaine' => '24,33,40,47,64',
-        'Auvergne' => '03,15,43,63',
-        'Basse-Normandie' => '14,50,61',
-        'Bourgogne' => '21,58,71,89',
-        'Bretagne' => '22,29,35,56',
-        'Centre' => '18,28,36,37,41,45',
-        'Champagne-Ardenne' => '08,10,51,52',
-        'Corse' => '20',
-        'Franche-Comté' => '25,39,70,90',
-        'Haute-Normandie' => '27,76',
-        'Ile-de-France' => '75,77,78,91,92,93,94,95',
-        'Languedoc-Roussillon' => '11,30,34,48,66',
-        'Limousin' => '19,23,87',
-        'Lorraine' => '54,55,57,88',
-        'Midi-Pyrénées' => '09,12,31,32,46,65,81,82',
-        'Nord-Pas de Calais' => '59,62',
-        'Outre-Mer' => '971,972,973,974,976', 
-        'Pays de la Loire' => '44,49,53,72,85',
-        'Picardie' => '02,60,80',
-        'Poitou-Charentes' => '16,17,79,86',
-        'Provence-Alpes-Côte d\'Azur' => '04,05,06,13,83,84',
-        'Rhône-Alpes' => '01,07,26,38,42,69,73,74',
+        'alsace' => '67,68',
+        'aquitaine' => '24,33,40,47,64',
+        'auvergne' => '03,15,43,63',
+        'basse-normandie' => '14,50,61',
+        'bourgogne' => '21,58,71,89',
+        'bretagne' => '22,29,35,56',
+        'centre' => '18,28,36,37,41,45',
+        'champagne-ardenne' => '08,10,51,52',
+        'corse' => '20',
+        'franche-comte' => '25,39,70,90',
+        'haute-normandie' => '27,76',
+        'ile-de-france' => '75,77,78,91,92,93,94,95',
+        'languedoc-roussillon' => '11,30,34,48,66',
+        'limousin' => '19,23,87',
+        'lorraine' => '54,55,57,88',
+        'midi-pyrenees' => '09,12,31,32,46,65,81,82',
+        'nord-pas-de-calais' => '59,62',
+        'outre-mer' => '971,972,973,974,976', 
+        'pays-de-la-loire' => '44,49,53,72,85',
+        'picardie' => '02,60,80',
+        'poitou-charentes' => '16,17,79,86',
+        'provence-alpes-cote-d-azur' => '04,05,06,13,83,84',
+        'rhone-alpes' => '01,07,26,38,42,69,73,74',
     );
     
+    public static $regionRealName = array(
+        'alsace' => 'Alsace',
+        'aquitaine' => 'Aquitaine',
+        'auvergne' => 'Auvergne',
+        'basse-normandie' => 'Basse-Normandie',
+        'bourgogne' => 'Bourgogne',
+        'bretagne' => 'Bretagne',
+        'centre' => 'Centre',
+        'champagne-ardenne' => 'Champagne-Ardenne',
+        'corse' => 'Corse',
+        'franche-comte' => 'Franche-Comté',
+        'haute-normandie' => 'Haute-Normandie',
+        'ile-de-france' => 'Ile-de-France',
+        'languedoc-roussillon' => 'Languedoc-Roussillon',
+        'limousin' => 'Limousin',
+        'lorraine' => 'Lorraine',
+        'midi-pyrenees' => 'Midi-Pyrénées',
+        'nord-pas-de-calais' => 'Nord-Pas de Calais',
+        'outre-mer' => 'Outre-Mer', 
+        'pays-de-la-loire' => 'Pays de la Loire',
+        'picardie' => 'Picardie',
+        'poitou-charentes' => 'Poitou-Charentes',
+        'provence-alpes-cote-d-azur' => 'Provence-Alpes-Côte d\'Azur',
+        'rhone-alpes' => 'Rhône-Alpes',
+    );
+
+    public static $regionCord = array(
+        'alsace'                     => array('lat' => 48.24906, 'lng' => 7.5372876),   
+        'aquitaine'                  => array('lat' => 44.24615, 'lng' => -0.1720401),  
+        'auvergne'                   => array('lat' => 45.7100344, 'lng' => 3.2768445), 
+        'basse-normandie'            => array('lat' => 48.9538229, 'lng' => -0.48921),  
+        'bourgogne'                  => array('lat' => 47.5622854, 'lng' => 6.90629),   
+        'bretagne'                   => array('lat' => 47.5909545, 'lng' => 6.997231),  
+        'centre'                     => array('lat' => 47.6439674, 'lng' => 1.5905734), 
+        'champagne-ardenne'          => array('lat' => 48.872864, 'lng' => 4.6373454),  
+        'corse'                      => array('lat' => 42.1805878, 'lng' => 9.0473778), 
+        'franche-comte'              => array('lat' => 47.1424245, 'lng' => 6.1973485), 
+        'haute-normandie'            => array('lat' => 49.369262, 'lng' => 0.934343),   
+        'ile-de-france'              => array('lat' => 48.6807925, 'lng' => 2.5025884), 
+        'languedoc-roussillon'       => array('lat' => 43.6543875, 'lng' => 3.266995),  
+        'limousin'                   => array('lat' => 45.6878315, 'lng' => 1.6202715), 
+        'lorraine'                   => array('lat' => 48.715081, 'lng' => 6.264212),   
+        'midi-pyrenees'              => array('lat' => 43.8090865, 'lng' => 1.5622975), 
+        'nord-pas-de-calais'         => array('lat' => 50.5290254, 'lng' => 2.8936409), 
+        'pays-de-la-loire'           => array('lat' => 47.417262, 'lng' => -0.8214825), 
+        'picardie'                   => array('lat' => 49.6017669, 'lng' => 2.8176709), 
+        'poitou-charentes'           => array('lat' => 46.1323699, 'lng' => -0.1747195),
+        'provence-alpes-cote-d-azur' => array('lat' => 44.0544365, 'lng' => 5.9746),    
+        'rhone-alpes'                => array('lat' => 45.317723, 'lng' => 5.4372395),  
+    );
+
     // All departement FR
     public static $departmentName = array(
         "01" => "Ain",
@@ -294,7 +345,7 @@ class DepartementHelper
         
         foreach(self::$regionName as $k => $v) {
             if (strpos($v, (string)$dep) !== false)
-                    return $k;
+                    return self::$regionRealName[$k];
         }
         return false;
     }
