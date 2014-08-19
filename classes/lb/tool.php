@@ -190,4 +190,16 @@ Class Tool
 		
 	}
 
+	public static function url($uri)
+	{
+		if( ! preg_match("#^(http|https|ftp)://#i", $uri))
+		{
+			return 'http://'.$uri;
+		}
+		else
+		{
+			return $uri;
+		}
+	}
+
 }
