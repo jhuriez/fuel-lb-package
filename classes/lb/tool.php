@@ -192,7 +192,9 @@ Class Tool
 
 	public static function url($uri)
 	{
-		if( ! preg_match("#^(http|https|ftp)://#i", $uri))
+		$uri = str_replace("\n", "", $uri);
+		$uri = str_replace("\r", "", $uri);
+		if($uri && ! empty($uri) && ! preg_match("#^(http|https|ftp)://#i", $uri))
 		{
 			return 'http://'.$uri;
 		}
