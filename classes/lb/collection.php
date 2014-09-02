@@ -165,6 +165,10 @@ class Collection
                     $value = explode($arg, $value);
                 break;
 
+                case 'stripslashes':
+                    $value = stripslashes($value);
+                break;
+
                 case 'int':
                     $value = (int)$value;
                 break;
