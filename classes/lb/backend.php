@@ -41,6 +41,7 @@ Class Backend
         $id = (isset($options['id'])) ? $options['id'] : false;
         $moreClasses = (isset($options['class'])) ? $options['class'] : '';
         $attr = (isset($options['attr'])) ? $options['attr'] : array();
+        $icon = (isset($options['icon'])) ? $options['icon'] : false;
 
         $res = '<a href="'.$url.'"';
 
@@ -51,26 +52,26 @@ Class Backend
             case 'add':
                 $class .= ' btn-success';
                 ! $title and $title = 'Ajouter';
-                $icon = 'fa-plus';
+                $icon or $icon = 'fa-plus';
 
                 break;
 
             case 'edit':
                 $class .= ' btn-warning';
                 ! $title and $title = 'Modifier';
-                $icon = 'fa-pencil';
+                $icon or $icon = 'fa-pencil';
                 break;
 
             case 'delete':
                 $class .= ' btn-danger';
                 ! $title and $title = 'Supprimer';
-                $icon = 'fa-trash-o';
+                $icon or $icon = 'fa-trash-o';
                 break;
 
             case 'view':
                 $class .= ' btn-info';
                 ! $title and $title = 'Voir';
-                $icon = 'fa-search';
+                $icon or $icon = 'fa-search';
                 break;
         }
 
