@@ -71,6 +71,12 @@ Class Backend
                 $attr['onclick'] = "return confirm('Etes vous sûre de vouloir supprimer ?');";
                 break;
 
+            case 'deactivate':
+                $class .= ' btn-danger';
+                ! $title and $title = 'Désactiver';
+                $icon or $icon = 'fa-archive';
+                break;
+
             case 'view':
                 $class .= ' btn-info';
                 ! $title and $title = 'Voir';
