@@ -66,6 +66,9 @@ Class Backend
                 $class .= ' btn-danger';
                 ! $title and $title = 'Supprimer';
                 $icon or $icon = 'fa-trash-o';
+
+                // Onclick delete
+                $attr['onclick'] = "return confirm('Etes vous sûre de vouloir supprimer ?');";
                 break;
 
             case 'view':
