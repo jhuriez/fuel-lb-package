@@ -42,8 +42,16 @@ Class Backend
         $moreClasses = (isset($options['class'])) ? $options['class'] : '';
         $attr = (isset($options['attr'])) ? $options['attr'] : array();
         $icon = (isset($options['icon'])) ? $options['icon'] : false;
+        $onlyGroup = (isset($options['onlyGroup'])) ? (array)$options['onlyGroup'] : false;
+        $toggleStatus = (isset($options['toggleStatus'])) ? $options['toggleStatus'] : null;
 
-        $res = '<a href="'.$url.'"';
+        // Gestion permission groupe
+        if ($onlyGroup)
+        {
+            $user = \Model\Auth_User::find(\Auth::get('id'));
+            if ( ! $user || ! in_array($user->group->name, $onlyGroup))
+                return '';
+        }
 
         // By type
         $class = 'btn btn-circle';
@@ -71,10 +79,20 @@ Class Backend
                 $attr['onclick'] = "return confirm('Etes vous sûre de vouloir supprimer ?');";
                 break;
 
-            case 'deactivate':
-                $class .= ' btn-danger';
-                ! $title and $title = 'Désactiver';
-                $icon or $icon = 'fa-archive';
+            case 'toggle-active':
+                if ($toggleStatus)
+                {
+                    $class .= ' btn-success';
+                    ! $title and $title = 'Cliquez pour désactiver';
+                    $icon or $icon = 'fa-check'; 
+                }
+                else
+                {
+                    $class .= ' btn-danger';
+                    ! $title and $title = 'Cliquez pour activer';
+                    $icon or $icon = 'fa-close';
+                }
+
                 break;
 
             case 'view':
@@ -83,6 +101,8 @@ Class Backend
                 $icon or $icon = 'fa-search';
                 break;
         }
+
+        $res = '<a href="'.$url.'"';
 
         // Link class
         $class .= ' '.$moreClasses;
