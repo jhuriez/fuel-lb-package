@@ -71,11 +71,16 @@ Class Tool
 	 * Helper for image upload process
 	 * @return string name of the new image
 	 */
-	public static function processUpload($uploadConfig = array(), $fieldsName = array(), $miniatureConfig = array(), $prefixName = '', $returnArray = false)
+	public static function processUpload($uploadConfig = array(), $fieldsName = array(), $miniatureConfig = array(), $prefixName = '', $returnArray = false, $forceArray = false)
 	{
 		$imageName = '';
-		$fieldsName[] = 'Filedata'; // If Uploadify
-		$fieldsName[] = 'files:0'; // If File Upload Bootstrap
+
+		if ( ! empty($fieldsName))
+		{
+			$fieldsName[] = 'Filedata'; // If Uploadify
+			$fieldsName[] = 'files:0'; // If File Upload Bootstrap
+		}
+		$results = array();
 
 		// Config miniature
 		(!isset($miniatureConfig['quality']) || !$miniatureConfig['quality']) and $miniatureConfig['quality'] = 70;
@@ -83,8 +88,11 @@ Class Tool
 		$miniatureConfig['resize'] = isset($miniatureConfig['resize']) && $miniatureConfig['resize'] !== null ? 
 									$miniatureConfig['resize'] : (isset($miniatureConfig['height']) && $miniatureConfig['height'] !== null &&
 																  isset($miniatureConfig['width']) && $miniatureConfig['width'] !== null);
-		(!isset($miniatureConfig['ext']) || empty($miniatureConfig['ext'])) and $miniatureConfig['ext'] = array();
-		(!is_array($miniatureConfig['ext'])) and $miniatureConfig['ext'] = array($miniatureConfig['ext']);
+
+		if (!isset($miniatureConfig['ext']) || empty($miniatureConfig['ext']))
+			$miniatureConfig['ext'] = array();
+		else
+			$miniatureConfig['ext'] = (array)$miniatureConfig['ext'];
 
 		// Upload
 		\Upload::process($uploadConfig);
@@ -93,19 +101,20 @@ Class Tool
 		if (\Upload::is_valid()){
 			\Upload::save();
 			foreach (\Upload::get_files() as $file){
-				if (in_array($file['field'], $fieldsName))
+				if (in_array($file['field'], $fieldsName) || empty($fieldsName))
 				{
 					$savedAs = $file['saved_as'];
 					$path = $uploadConfig['path'];
+					$isImage = in_array($file['extension'], array('img', 'png', 'jpg', 'jpeg', 'bmp', 'gif'));
 
 					// Get extension
-					(empty($miniatureConfig['ext']) || !$miniatureConfig) and $miniatureConfig['ext'][] = $file['extension'];
+					(empty($miniatureConfig['ext']) || !$miniatureConfig) and $isImage and $miniatureConfig['ext'][] = $file['extension'];
 					$extCast = reset($miniatureConfig['ext']);
 
 					///////////////////////////////////////////
 					// Original convert (for extension) 	 //
 					///////////////////////////////////////////
-					if ( ! in_array($file['extension'], $miniatureConfig['ext']))
+					if ( ! in_array($file['extension'], $miniatureConfig['ext']) && $isImage)
 					{
 						$image = \Image::forge()->load($path . DS . $savedAs);
 						$originalImageNameNoExtension = \Str::sub($savedAs, 0, strlen($extCast)*-1-1);
@@ -134,30 +143,46 @@ Class Tool
 						$extCast = $file['extension'];
 					}
 
-
 					/////////////////////////
 					// Optimize image 	   //
 					/////////////////////////
-					$optimizedImage = \Image::forge(array('quality' => $miniatureConfig['quality']));
-					$optimizedImage->load($path . DS . $savedAs);
-					$optimizedImageName = \Str::sub($savedAs, 0, strlen($extCast)*-1-1) . '.' . $extCast;
+					if ($isImage)
+					{
+						$optimizedImage = \Image::forge(array('quality' => $miniatureConfig['quality']));
+						$optimizedImage->load($path . DS . $savedAs);
+						$optimizedImageName = \Str::sub($savedAs, 0, strlen($extCast)*-1-1) . '.' . $extCast;
 
-	                // Check if folder exist
-	                if (!file_exists($uploadConfig['path'] . DS . $miniatureConfig['folder']))
-	                    \File::create_dir($uploadConfig['path'], $miniatureConfig['folder']);
+		                // Check if folder exist
+		                if (!file_exists($uploadConfig['path'] . DS . $miniatureConfig['folder']))
+		                    \File::create_dir($uploadConfig['path'], $miniatureConfig['folder']);
 
-	                // Save the mini
-	                if ($miniatureConfig['resize'] == true)
-	                {
-	                	$sizes = $optimizedImage->sizes();
-	                	$width = $miniatureConfig['width'];
-	                	$height = $miniatureConfig['height'];
+		                // Save the mini
+		                if ($miniatureConfig['resize'] == true)
+		                {
+		                	$sizes = $optimizedImage->sizes();
+		                	$width = $miniatureConfig['width'];
+		                	$height = $miniatureConfig['height'];
 
-	                	if ($width < $sizes->width || $height < $sizes->height)
-			                $optimizedImage = $optimizedImage->resize($width, $height, true);
-	                }
-		            $optimizedImage->save($uploadConfig['path'] . DS . $miniatureConfig['folder'] . DS . $optimizedImageName);
-					$imageName = $prefixName . DS . $miniatureConfig['folder'] . DS . $optimizedImageName;
+		                	if ($width < $sizes->width || $height < $sizes->height)
+				                $optimizedImage = $optimizedImage->resize($width, $height, true);
+		                }
+			            $optimizedImage->save($uploadConfig['path'] . DS . $miniatureConfig['folder'] . DS . $optimizedImageName);
+						$imageName = $prefixName . DS . $miniatureConfig['folder'] . DS . $optimizedImageName;
+					}
+					else
+					{
+						$imageName = $prefixName . DS . $savedAs;
+						$optimizedImageName = '';
+					}
+
+
+					// Replace "\" by "/" standard URI
+					$imageName = str_replace(DS.DS, '/', $imageName);
+					$imageName = str_replace(DS, '/', $imageName);
+
+					$results[$file['field']]['imageName'] = $imageName;
+					$results[$file['field']]['optimizedImageName'] = $optimizedImageName;
+					$results[$file['field']]['savedAs'] = $savedAs;
 				}
 			}
 		}
@@ -171,17 +196,20 @@ Class Tool
 			}
 		}
 
-		// Replace "\" by "/" standard URI
-		$imageName = str_replace(DS.DS, '/', $imageName);
-		$imageName = str_replace(DS, '/', $imageName);
+		
 
         if ($returnArray)
         {
-        	return array(
-    			'imageName' => $imageName,
-    			'imageNameSimple' => $optimizedImageName,
-    			'original' => $savedAs,
-    		);
+
+			// If only one file
+			if (count($results) == 1 && ! $forceArray)
+			{
+				return current($results);
+			}
+			else
+			{
+				return $results;
+			}
         }
         else
         {
