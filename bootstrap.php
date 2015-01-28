@@ -11,6 +11,7 @@ Autoloader::add_classes(array(
 		'Lb\\Lb_Addons_Twig'    => __DIR__.'/classes/lb/addons/twig.php',
 		'Lb\\DepartementHelper' => __DIR__.'/classes/lb/departementHelper.php',
 		'Lb\\ImageHelper' => __DIR__.'/classes/lb/imageHelper.php',
+		'Lb\\FileuploadHelper' => __DIR__.'/classes/lb/fileuploadHelper.php',
 		'Lb\\Validate' => __DIR__.'/classes/lb/validate.php',
 ));
 
