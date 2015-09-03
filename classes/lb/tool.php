@@ -68,6 +68,37 @@ Class Tool
 	}
 
 	/**
+	 * Create directory recursively
+	 * @param  [type] $path [description]
+	 * @param  [type] $base [description]
+	 * @return [type]       [description]
+	 */
+	public static function createDirRecursive($path, $base = DOCROOT)
+	{
+		$path = str_replace('/', DS, $path);
+		$path = str_replace('\\', DS, $path);
+
+
+		$arrPath = explode(DS, $path);
+		$cleanPath = '';
+		foreach($arrPath as $folder)
+		{
+			$folder = trim($folder);
+
+			if (empty($folder)) continue;
+			else
+			{
+				if (!is_dir($base.DS.$cleanPath.$folder))
+				{
+	        		\File::create_dir($base.DS.$cleanPath, $folder);
+				}
+
+				$cleanPath .= $folder.DS;
+			}
+		}
+	}
+
+	/**
 	 * Helper for image upload process
 	 * @return string name of the new image
 	 */
