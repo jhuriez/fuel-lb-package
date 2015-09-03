@@ -28,7 +28,7 @@ class DepartementHelper
         'pays-de-la-loire' => '44,49,53,72,85',
         'picardie' => '02,60,80',
         'poitou-charentes' => '16,17,79,86',
-        'provence-alpes-cote-d-azur' => '04,05,06,13,83,84',
+        'provence-alpes-cote-dazur' => '04,05,06,13,83,84',
         'rhone-alpes' => '01,07,26,38,42,69,73,74',
     );
     
@@ -54,7 +54,7 @@ class DepartementHelper
         'pays-de-la-loire' => 'Pays de la Loire',
         'picardie' => 'Picardie',
         'poitou-charentes' => 'Poitou-Charentes',
-        'provence-alpes-cote-d-azur' => 'Provence-Alpes-Côte d\'Azur',
+        'provence-alpes-cote-dazur' => 'Provence-Alpes-Côte d\'Azur',
         'rhone-alpes' => 'Rhône-Alpes',
     );
 
@@ -79,7 +79,7 @@ class DepartementHelper
         'pays-de-la-loire'           => array('lat' => 47.417262, 'lng' => -0.8214825), 
         'picardie'                   => array('lat' => 49.6017669, 'lng' => 2.8176709), 
         'poitou-charentes'           => array('lat' => 46.1323699, 'lng' => -0.1747195),
-        'provence-alpes-cote-d-azur' => array('lat' => 44.0544365, 'lng' => 5.9746),    
+        'provence-alpes-cote-dazur' => array('lat' => 44.0544365, 'lng' => 5.9746),    
         'rhone-alpes'                => array('lat' => 45.317723, 'lng' => 5.4372395),  
     );
 

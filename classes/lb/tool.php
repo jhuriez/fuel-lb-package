@@ -40,7 +40,8 @@ Class Tool
 	 */
 	public static function date($format, $date)
 	{
-		if ($format == NULL || $date == NULL){
+		if ($format == NULL || $date == NULL || $date == '' || $date == '0000-00-00 00:00:00')
+		{
 			return false;
 		}
 
