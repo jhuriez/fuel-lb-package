@@ -197,9 +197,105 @@ class Collection
                     else if ($value == '0') $value = false;
                     else $value = (boolean)$value;
                 break;
+
+                case 'date':
+                    if ($value == '' || $value == null) $value = null;
+                    else $value = \Date::create_from_string($value, 'eu')->format('mysql');
+                break;
+
+                case 'date_day_include':
+                    if ($value == '' || $value == null) $value = null;
+                    else $value = \Date::forge(\Date::create_from_string($value, 'eu')->get_timestamp() + 86399)->format('mysql');
+                break;
             }
         }
 
         return $value;
+    }
+
+
+    public static function getPrototypeVars($object, $args)
+    {
+        $resArray = array();
+
+        ///////////////
+        // For isNew //
+        ///////////////
+        
+        // Set object or variable to get result
+        if (isset($args['toCheck']))
+        {
+            $toCheck = $args['toCheck'];
+        }
+        else
+        {
+            $toCheck = $object;
+        }
+
+        $resArray['new'] = (isset($toCheck->id)) ? '0' : '__isNew__';
+
+        ////////////////
+        // Parse Args //
+        ////////////////
+        foreach($args as $varName => $options)
+        {
+
+            if (is_numeric($varName))
+            {
+                $varName = $options;
+            }
+
+            // Set object or variable to get result
+            if (isset($options['toCheck']))
+            {
+                $toCheck = $options['toCheck'];
+            }
+            else
+            {
+                $toCheck = $object;
+            }
+
+            // Set object or variable to get result
+            if (isset($options['toResult']))
+            {
+                $toResult = $options['toResult'];
+            }
+            else
+            {
+                $toResult = $object;
+            }
+
+            // If exist
+            if (isset($toCheck->id))
+            {
+                if (isset($options['return']))
+                {
+                    switch($options['return']['type'])
+                    {
+                        case 'function':
+                            $res = $toResult->{$options['return']['value']}();
+                        break;
+
+                        case 'checkbox':
+                            $res = ($toResult->{$varName}) ? ' checked="checked"' : '';
+                        break;
+                    }
+                }
+                else
+                {
+                    $res = $toResult->{$varName};
+                }
+            }
+            // New object
+            else
+            {
+                $res = '__'.$varName.'__';
+            }
+
+            $resArray[$varName] = $res;
+
+        }
+
+        return $resArray;
     }
 }
