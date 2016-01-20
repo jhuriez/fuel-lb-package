@@ -1,6 +1,6 @@
 <?php
 
-Autoloader::add_core_namespace('Lb');
+Autoloader::add_namespace('Lb', __DIR__);
 
 Autoloader::add_classes(array(
 		'Lb\\Backend'    => __DIR__.'/classes/lb/backend.php',
