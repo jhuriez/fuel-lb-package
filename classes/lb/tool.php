@@ -106,6 +106,7 @@ Class Tool
 	public static function processUpload($uploadConfig = array(), $fieldsName = array(), $miniatureConfig = array(), $prefixName = '', $returnArray = false, $forceArray = false)
 	{
 		$imageName = '';
+		$optimizedImageName = '';
 
 		if ( ! empty($fieldsName))
 		{
@@ -137,16 +138,16 @@ Class Tool
 				{
 					$savedAs = $file['saved_as'];
 					$path = $uploadConfig['path'];
-					$isImage = in_array($file['extension'], array('img', 'png', 'jpg', 'jpeg', 'bmp', 'gif'));
+					$isImage = in_array(strtolower($file['extension']), array('img', 'png', 'jpg', 'jpeg', 'bmp', 'gif'));
 
 					// Get extension
-					(empty($miniatureConfig['ext']) || !$miniatureConfig) and $isImage and $miniatureConfig['ext'][] = $file['extension'];
+					(empty($miniatureConfig['ext']) || !$miniatureConfig) and $isImage and $miniatureConfig['ext'][] = strtolower($file['extension']);
 					$extCast = reset($miniatureConfig['ext']);
 
 					///////////////////////////////////////////
 					// Original convert (for extension) 	 //
 					///////////////////////////////////////////
-					if ( ! in_array($file['extension'], $miniatureConfig['ext']) && $isImage)
+					if ( ! in_array(strtolower($file['extension']), $miniatureConfig['ext']) && $isImage)
 					{
 						$image = \Image::forge()->load($path . DS . $savedAs);
 						$originalImageNameNoExtension = \Str::sub($savedAs, 0, strlen($extCast)*-1-1);
@@ -172,7 +173,7 @@ Class Tool
 					}
 					else
 					{
-						$extCast = $file['extension'];
+						$extCast = strtolower($file['extension']);
 					}
 
 					/////////////////////////
@@ -182,7 +183,7 @@ Class Tool
 					{
 						$optimizedImage = \Image::forge(array('quality' => $miniatureConfig['quality']));
 						$optimizedImage->load($path . DS . $savedAs);
-						$optimizedImageName = \Str::sub($savedAs, 0, strlen($extCast)*-1-1) . '.' . $extCast;
+						$imageName = \Str::sub($savedAs, 0, strlen($extCast)*-1-1) . '.' . $extCast;
 
 		                // Check if folder exist
 		                if (!file_exists($uploadConfig['path'] . DS . $miniatureConfig['folder']))
@@ -198,8 +199,8 @@ Class Tool
 		                	if ($width < $sizes->width || $height < $sizes->height)
 				                $optimizedImage = $optimizedImage->resize($width, $height, true);
 		                }
-			            $optimizedImage->save($uploadConfig['path'] . DS . $miniatureConfig['folder'] . DS . $optimizedImageName);
-						$imageName = $prefixName . DS . $miniatureConfig['folder'] . DS . $optimizedImageName;
+			            $optimizedImage->save($uploadConfig['path'] . DS . $miniatureConfig['folder'] . DS . $imageName);
+						$optimizedImageName = $prefixName . DS . $miniatureConfig['folder'] . DS . $imageName;
 					}
 					else
 					{
@@ -211,6 +212,9 @@ Class Tool
 					// Replace "\" by "/" standard URI
 					$imageName = str_replace(DS.DS, '/', $imageName);
 					$imageName = str_replace(DS, '/', $imageName);
+
+					$optimizedImageName = str_replace(DS.DS, '/', $optimizedImageName);
+					$optimizedImageName = str_replace(DS, '/', $optimizedImageName);
 
 					$results[$file['field']]['imageName'] = $imageName;
 					$results[$file['field']]['optimizedImageName'] = $optimizedImageName;
@@ -228,11 +232,8 @@ Class Tool
 			}
 		}
 
-		
-
-        if ($returnArray)
-        {
-
+    if ($returnArray)
+    {
 			// If only one file
 			if (count($results) == 1 && ! $forceArray)
 			{
@@ -242,11 +243,18 @@ Class Tool
 			{
 				return $results;
 			}
-        }
-        else
-        {
-			return $imageName;
-        }
+    }
+    else
+    {
+    	if (empty($optimizedImageName))
+    	{
+				return $imageName;
+    	}
+    	else
+    	{
+    		return $optimizedImageName;
+    	}
+    }
 		
 	}
 
