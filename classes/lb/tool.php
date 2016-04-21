@@ -205,7 +205,7 @@ Class Tool
 					else
 					{
 						$imageName = $prefixName . DS . $savedAs;
-						$optimizedImageName = '';
+						$optimizedImageName = $imageName;
 					}
 
 
